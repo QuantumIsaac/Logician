@@ -1,0 +1,17 @@
+./logician/parser/Errors.java
+./logician/parser/ParseHandler.java
+./logician/parser/ast/ASTCall.java
+./logician/parser/ast/ASTNumber.java
+./logician/parser/ast/ASTExpression.java
+./logician/parser/ast/ASTPrototype.java
+./logician/parser/ast/ASTGiven.java
+./logician/parser/ast/ASTProcedure.java
+./logician/parser/ast/ASTBinary.java
+./logician/parser/ast/ASTVariable.java
+./logician/parser/Parser.java
+./logician/lexer/Lexer.java
+./logician/lexer/Tokens.java
+./logician/lexer/Token.java
+./logician/lexer/Identifier.java
+./logician/lexer/LexerUtil.java
+./logician/lexer/LexerNumber.java

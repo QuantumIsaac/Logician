@@ -1,0 +1,4 @@
+export CLASSPATH="../bin"
+cd ../src
+find -name "*.java" > SOURCES.txt
+javac @SOURCES.txt -d ../bin

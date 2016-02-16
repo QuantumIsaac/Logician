@@ -42,7 +42,6 @@ public class Lexer{
 						numstr += lastchar.charValue();
 					}
 				}
-				return new LexerNumber(Double.parseDouble(numstr));
 			}else{
 				switch(lastchar.charValue()){
 					case '{':

@@ -40,10 +40,6 @@ public class Parser{
 		current = lex.getToken();
 		return current;
 	}
-	private void ignoreWhitespace(){
-		while(nextToken().getToken() == TK_WHITESPACE || nextToken().getToken() == TK_LINE_END);
-		//Get rid of whitespace.
-	}
 	public ASTExpression parseNumExp(){
 		if(current instanceof LexerNumber){
 			ASTNumber num = new ASTNumber( ((LexerNumber)current).getNumVal() );
@@ -73,12 +69,12 @@ public class Parser{
 	public ASTExpression parseIdentifierExp(){
 		if(  current instanceof Identifier  ){
 			String ident = ((Identifier)current).getIdentifier();
-			ignoreWhitespace(); //Eat up whitespace and get next token
+			nextToken();
 			Tokens cur = current.getToken();
 			if( cur != TK_OPEN_PAREN )
 				return new ASTVariable(ident);
 			else{
-				ignoreWhitespace();
+				nextToken();
 				ArrayList<ASTExpression> args = new ArrayList<>();
 				if(current.getToken() != TK_CLOSED_PAREN){
 					while(true){
@@ -90,7 +86,7 @@ public class Parser{
 							Errors.Error("')' or ',' expected in arguments list.");
 							return null;
 						}
-						ignoreWhitespace();
+						nextToken();
 					}
 				}
 				return new ASTCall(ident,args);
@@ -103,7 +99,6 @@ public class Parser{
 	}
 
 	public ASTExpression parsePrimary(){
-		System.out.println("Parsing...");
 		switch(current.getToken()){
 			case TK_IDENTIFIER:
 				return parseIdentifierExp();
@@ -111,8 +106,6 @@ public class Parser{
 				return parseNumExp();
 			case TK_OPEN_PAREN:
 				return parseParenExp();
-			case TK_GIVEN:
-				return parseGivenExp();
 			default:
 				Errors.Error("Unknown token when expecting an expression");
 				return null;
@@ -130,14 +123,6 @@ public class Parser{
 		if( left == null ) return null;
 
 		return parseBinRight(0,left);
-	}
-	public ASTGiven parseGivenExp(){
-		ignoreWhitespace(); //Eat 'Given' and whitespace
-		System.out.println("Hello!");
-		if(current instanceof Identifier){
-			return new ASTGiven(( (Identifier) current).getIdentifier());
-		}
-		return null;
 	}
 	public ASTExpression parseBinRight(int prec, ASTExpression left){
 		while(true){
@@ -222,55 +207,30 @@ public class Parser{
 		public void handleTopLevel(){
 			System.out.println("Top-level parsed.");
 		}
-		public void handleGiven(){
-			System.out.println("Given statement handled.");
-		}
 	};
 	public ParseHandler getParseHandler(){
 		return ph;
 	}
 
-	public boolean parse(){
+	public void parse(){
 		nextToken(); //Start with a token.
-		if(current == null){
-			return false;
-		}
 		switch(current.getToken()){
 			case TK_PROCEDURE: ph.handleProcedure(); break;
 			case TK_EXTERN: ph.handleExtern(); break;
 			default: ph.handleTopLevel(); break;
 		}
-		return true;
-	}
-	public void parseAll(){
-		while(parse()); //Just keep parsing...
 	}
 
 	public static void main(String[] args){
 		Scanner sc = new Scanner(System.in);
 		String line;
-		String total = "";
-		boolean first = true;
 		while(true){
-			System.out.print("Line: ");
+			System.out.print("Ready> ");
 			line = sc.nextLine();
 			if(line.equals("exit")) break;
-			else if(line.equals("eof")){
-				Lexer lex = new Lexer(total);
-				Token cur;
-				while( (cur = lex.getToken()) != null){
-					System.out.println("Token: "+cur.getToken().toString());
-				}
-				Parser parser = new Parser(total);
-				parser.parseAll();
-				first = true;
-			}else{
-				if(first){
-					total = line;
-					first = false;
-				}else{
-					total+= '\n'+line;
-				}
+			else{
+				Parser parser = new Parser(line);
+				parser.parse();
 			}
 		}
 	}
